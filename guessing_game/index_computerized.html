@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Battleship!</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta:wght@100..900&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="experiment">
+  <p id="title"><strong>Battleship!</strong></p>
+  <p id="browserCompat"><strong>Unfortunately, this study does not work in your current browser. Please use Chrome, Firefox, or Safari. Sorry!</strong></p>
+
+  <div id="instructions" class="instructions">
+    <p>Here, you'll play a randomness game against an opponent.</p>
+    <p>Specifically, you'll be playing a game that's a lot like battleship. Importantly, <strong>you'll be playing against an opponent who has previously placed their ship (and is not doing it live)</strong>.</p>
+    <p>Instead of playing on one big board that remains across turns (like in normal battleship), you'll play on a new mini-board each turn.</p>
+    <p>Here's how it will work:</p>
+    <p>Your opponent has <strong><span style="color: teal;">placed</span> a ship in a random tile</strong> on each trial. They don't want you to guess its location, so they are trying to be unpredictable. They generated these sequences previously, so you're just playing against the choices they previously made. (For that reason, the game will go fast!)</p>
+    <p>You will be trying to <strong><span style="color: teal;">guess</span> the random tile, thus sinking your opponent's ship</strong>. Remember that your opponent previously placed their ships in a way that was unpredictable.</p>
+    <p>The game will last 150 turns in total.</p>
+    <p>To continue, press the <span class="keyboardkey">&#8594;</span> key on your keyboard.</p>
+  </div>
+
+  <div id="trialInstructions" class="trialInstructions" style="display:none;">
+    <p style="text-align:center">Guess where your opponent placed their ship (you have 3 guesses)</p>
+  </div>
+
+  <div id="gameGrid" class="instructions" style="display:none;">
+    <div class="side left">
+      <div class="player-row">
+        <p id="leftPlayerName" class="player-name">OPPONENT</p>
+        <img src="images/p1.png" class="player" />
+      </div>
+      <div class="square square-left">
+        <p id="squareTextLeft" class="square-text"></p>
+        <div id="gridContainerLeft">
+          <div class="grid-box" id="leftBox1"></div>
+          <div class="grid-box" id="leftBox2"></div>
+          <div class="grid-box" id="leftBox3"></div>
+          <div class="grid-box" id="leftBox4"></div>
+          <div class="grid-box" id="leftBox5"></div>
+          <div class="grid-box" id="leftBox6"></div>
+          <div class="grid-box" id="leftBox7"></div>
+          <div class="grid-box" id="leftBox8"></div>
+          <div class="grid-box" id="leftBox9"></div>
+        </div>
+      </div>
+    </div>
+    <div class="side right">
+      <div class="player-row">
+        <p id="rightPlayerName" class="player-name">YOU</p>
+        <img src="images/p2.png" class="player" />
+      </div>
+      <div class="square square-right">
+        <p id="squareTextRight" class="square-text"></p>
+        <div id="gridContainerRight">
+          <div class="grid-box" id="rightBox1"></div>
+          <div class="grid-box" id="rightBox2"></div>
+          <div class="grid-box" id="rightBox3"></div>
+          <div class="grid-box" id="rightBox4"></div>
+          <div class="grid-box" id="rightBox5"></div>
+          <div class="grid-box" id="rightBox6"></div>
+          <div class="grid-box" id="rightBox7"></div>
+          <div class="grid-box" id="rightBox8"></div>
+          <div class="grid-box" id="rightBox9"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="score-row left">
+      <p id="leftScore" class="score-num">Total score: 0</p>
+    </div>
+
+    <div class="score-row right">
+      <p id="rightScore" class="score-num">Total score: 0</p>
+    </div>
+  </div>
+
+  <div id="setupInstructions1" class="instructions setupInstructions" style="display:none;">
+    <p>You're the player on the right. Recall, your job is to <strong><span style="color: teal;">guess</span> where your opponent has placed their ship</strong>.</p>
+    <p>Your opponent (on the left) previously tried to <strong><span style="color: teal;">place</span> the ship in a random tile</strong>.</p>
+    <p>So, on each turn you'll guess where your opponent placed their ship. You'll guess the tiles by using using your mouse to click on the tile.</p>
+    <p>Press the <span class="keyboardkey">&#8594;</span> key to proceed.</p>
+  </div>
+
+  <div id="setupInstructions2" class="instructions setupInstructions">
+    <p>Let's go through a turn in the game. Your opponent has placed their ship in a random tile.</p>
+    <p>The placements were set by a real preson, but this is now just a computer re-creating their choices, so the choices will happen immediately.</p>
+    <p>So, you'll be able to start guessing immediately at the start of each turn.</p>
+    <p>Guess where your opponent placed their ship. You have 3 guesses!</p>
+  </div>
+
+  <div id="setupInstructions3" class="instructions setupInstructions">
+    <p>After you guess, you'll be able to see the ship's real location. In the real game, we'd then move on to a new turn of the game, allowing you to guess again on the next placement of the ship.</p>
+    <p>Press the <span class="keyboardkey">&#8594;</span> key to proceed.</p>
+  </div>
+
+  <div id="postPractice" class="instructions">
+    <p>The rest of the game will look just like this.</p>
+    <p>Remember, you're trying to <strong><span style="color: teal;">guess</span> where your opponent hid the ship</strong>, and your opponent is trying to <strong><span style="color: teal;">place</span> the ship in a random and unpredictable tile</strong>.</p>
+    <p>There will also be a point system in the game, just to make things more engaging. Every time you computer can't get your opponent's ship, they'll get +1. On the other hand, if you do guess it correctly, then you'll get +4 if you guess it on the first try, +3 if you guess it on the second try, and +2 if you guess it on the third try.</p>
+    <p>Ready to play? If so, press the <span class="keyboardkey">&#8594;</span> key.</p>
+  </div>
+
+</div>
+
+<div id="questionText" class="wrapup">
+  <strong>Please answer the following questions.</strong>
+  <p style="text-align:center">Please describe the task you had to complete in this study</p>
+  <textarea id="taskGuess" rows=4 cols=40 placeholder="Enter your amswer here..."></textarea>
+	<input type="hidden" id="taskGuess" name="taskGuess">
+  <br>
+  <p style="text-align:center">If you had to guess, what do you think was the purpose of this study?</p>
+  <textarea id="purposeGuess" rows=4 cols=40 placeholder="Enter your answer here..."></textarea>
+	<input type="hidden" id="purposeGuess" name="purposeGuess">
+  <br>
+  <p style="text-align:center">Did you feel that your opponent was predictable?</p>
+  <textarea id="predictableGuess" rows=4 cols=40 placeholder="Enter your answer here..."></textarea>
+	<input type="hidden" id="predictableGuess" name="predictableGuess">
+  <br>
+  <p style="text-align:center">What is 1 + 1?</p>
+  <textarea id="sumCheck" rows=1 cols=20 placeholder="Enter your answer here..."></textarea>
+  <br>
+  <br>
+  <a href='javascript:doneExperiment()' id='doneExperiment' class='button'>Next</a>
+</div>
+
+<div id="doneText" class="wrapup">
+	<strong>This is the last page of the study. Do not close your browser! You will be able to submit your results and be redirected to Prolific at the end of this page.</strong>
+  <br>
+  <p>You can also feel free to leave any comments below about how the experiment went, but that's up to you. Did everything seem to work OK?</p>
+	<textarea id="commentBox" rows=4 cols=40 placeholder="Enter your comments here..."></textarea>
+	<input type="hidden" id="comments" name="comments">
+  <br>
+  <br>
+  <br>
+  <a href='javascript:submitData("./data")' id='submitButton' class='button'>Submit results</a>
+  <br>
+  <span id="redirectToProlific">
+    <p>Your browser should automatically redirect you to Prolific's webpage where you will be given a completion code.</p>
+    <p>Redirecting in <span id = countDown><b></b></span> seconds.</p>
+    <p>If you're not automatically redirected in a few seconds, please copy and paste this address on your web browser:
+    <b><span id = urlProlific></span></b></p>
+  </span>
+</div>
+
+</body>
+</html>
+
+<script>
+  // global variables
+  var experimentName = 'strategic_randomness';
+  var experimentVersion = 'guessing_game_computerized';
+
+  var nTrials = 150; // 150 trials total
+  var trial, trials;
+  var oppNumber, chosenSeq, chosenSeqIndex, turnDone;
+  var currGen;
+  var guessHistory = [];
+  var rtHistory  = [];
+  var currentTrialNum = -1;
+  var fired = false;
+
+  var itiTime = 1000; // guess visible for 1000ms
+  let dotsInterval; // for slowresponse warning
+  var guessScore = 0;
+  var genScore = 0; // for score counts
+
+  var subjectID, studyID, sessionID; // subject params for identification
+  var responses = {}; // object to store responses
+  var startHITTime; // when the webpage loaded - for totalTime
+  var startExperimentTime; // when the experiment began - for experimentTime
+  var t0_respond; // when participants could respond on each trial - for responseTime
+  var answeredSum = false; // these 3 "false" things are for whether participants answered catch questions; they become true
+  var answeredTask = false; // after participants answer, allowing them to complete the experiment
+  var answeredPurpose = false;
+  var answeredPredictable = false;
+
+  var urlProlific = "https://app.prolific.com/submissions/"; // anonymized completion code
+  var finalCountDownClock = 5;
+
+  // get browser params, tell user browser is not compatible if needed
+  var browserInfo = getBrowser();
+  if (browserInfo['name'] == "msie" || browserInfo['name'] == "Opera") {
+    $('#browserCompat').show();
+  } else {
+    $('#browserCompat').hide();
+  }
+  $('#setupInstructions1').hide();
+  $('#setupInstructions2').hide();
+  $('#setupInstructions3').hide();
+  $('#postPractice').hide();
+  $('#gameGrid, #slowResponse, #trialInstructions').hide();
+  $('#submitDataButton, #submittedData, #redirectToProlific').hide();
+
+  $(document).ready(function(){
+    introRoutines();
+  });
+
+  function introRoutines() {
+    [subjectID, studyID, sessionID] = getProlificInfo();
+    responses['trialData'] = [];
+
+    startHITTime = currentTime();
+
+    sequences = loadFile('sequences/computerized.txt');
+    console.log(sequences.length);
+    chosenSeqIndex = getRandomInt(0, sequences.length);
+    chosenSeq = sequences[chosenSeqIndex];
+
+    trials = generateTrials();
+
+    $('#instructions').show();
+    fired = false;
+    $(document).keydown(function(e) {
+      if (!fired && e.keyCode == 39) {
+        fired = true;
+        $(document).off("keydown");
+        showSetup1();
+      }
+    });
+  }
+
+  function getProlificInfo() {
+    let urlParams = new URLSearchParams(window.location.search);
+    prolificPID = urlParams.get("PROLIFIC_PID");
+    studyID = urlParams.get("STUDY_ID");
+    sessionID = urlParams.get("SESSION_ID");
+    return [prolificPID, studyID, sessionID]
+  }
+
+  function loadFile(filePath) {
+      var dataArray = [];
+
+      $.ajax({
+          url: filePath,
+          async: false,
+          dataType: "text",
+          success: function(response) {
+              var lines = response.trim().split("\n");
+              dataArray = lines.map(line => line.split(","));
+          },
+          error: function(xhr, status, error) {
+              throw new Error("Failed to load file: " + error);
+          }
+      });
+
+      return dataArray;
+  }
+
+  function generateTrials() {
+    trials = [];
+
+    // practice trials
+    for (var i = 0; i < nTrials; i++) {
+      trial = {}
+      trial.opponentNumber = parseInt(chosenSeq[i]);
+      trial.opponentIndex = chosenSeqIndex;
+
+      trials.push(trial);
+    }
+
+    return trials;
+  }
+
+  function showSetup1() {
+    $('#instructions').hide();
+
+    $('#setupInstructions1').fadeIn();
+    $('#gameGrid').fadeIn();
+
+    $('#gridContainerLeft, #gridContainerRight').addClass('disabled');
+
+    fired = false;
+    document.onkeydown = function(e) {
+      if (!fired) {
+        if (e.keyCode == 39) {
+              fired = true;
+              showSetup2();
+          }
+      }
+    }
+  }
+
+  function showSetup2() {
+    document.onkeydown = null
+
+    $('#setupInstructions1').hide();
+    $('#setupInstructions2').fadeIn();
+
+    $('#gridContainerRight').removeClass('disabled');
+    currGen = getRandomInt(1,9);
+    guessHistory = [];
+
+    fired = false;
+    $('#gridContainerRight .grid-box').off('click').on('click', function() {
+      if (!fired) {
+        fired = true;
+        currGuess = parseInt($(this).attr('id').replace('rightBox', ''));
+        guessHistory.push(currGuess);
+
+        $(this).off('click');
+        $(this).addClass('disabled');
+
+        if (currGuess == currGen) {
+          $(this).css('background-color', 'red');
+          turnDone = true;
+        } else {
+          $(this).css('background-color', 'black');
+        }
+
+        if (guessHistory.length == 3) {
+          turnDone = true;
+        }
+
+        if (turnDone) {
+          showSetup3();
+        } else {
+          fired = false;
+        }
+      }
+    });
+
+  }
+
+  function showSetup3() {
+
+    $('#gridContainerRight .grid-box').off('click');
+    $('#gridContainerRight .grid-box').addClass('disabled');
+    $('#setupInstructions2').hide();
+    $('#setupInstructions3').show();
+    fired = false;
+
+    $('#leftBox' + currGen).addClass('ship');
+
+    requestAnimationFrame(() => {
+      $('#leftBox' + currGen).addClass('show-ship')
+    });
+
+    document.onkeydown = function(e) {
+      if (!fired) {
+        if (e.keyCode == 39) {
+              fired = true;
+              postPractice();
+          }
+      }
+    }
+
+  }
+
+  function postPractice() {
+    $('#gameGrid, #setupInstructions3').hide();
+
+    $('#postPractice').show();
+
+    fired = false;
+    document.onkeydown = function(e) {
+      if (!fired) {
+        if (e.keyCode == 39) {
+              fired = true;
+              startExperiment();
+          }
+      }
+    }
+  }
+
+
+  function startExperiment() {
+    $('#postPractice').hide();
+    $('.left, .right').css("top", "12vh");
+    $('#squareTextLeft, #squareTextRight').text("");
+    $('#squareTextLeft, #squareTextRight').css("display", "none");
+    startExperimentTime = currentTime();
+
+    loadTrial();
+
+  }
+
+  function loadTrial() {
+    currentTrialNum++;
+
+    $('#gridContainerLeft .grid-box').removeClass('ship show-ship')
+    $('#gridContainerRight').removeClass('disabled');
+    $('#gridContainerRight .grid-box').removeClass('disabled');
+    $('#gridContainerRight .grid-box').css('background-color', '#fff');
+    $('#gridContainerLeft, #gridContainerRight').hide();
+
+    if (currentTrialNum < nTrials) {
+      trial = trials[currentTrialNum];
+      trial['trialID'] = currentTrialNum;
+      runTrial();
+    } else {
+      showQuestion();
+    }
+
+  }
+
+  function runTrial() {
+    $('#gameGrid').show();
+    fired = false;
+    document.onkeydown = null;
+
+    $('#trialInstructions').show();
+    $('#gridContainerRight').removeClass('disabled');
+    $('#gridContainerLeft, #gridContainerRight').fadeIn(250);
+    t0_respond = currentTime();
+
+    rtHistory = [];
+    guessHistory = [];
+    fired = false;
+    turnDone = false;
+    $('#gridContainerRight .grid-box').off('click').on('click', function() {
+      if (!fired) {
+        fired = true;
+
+        rtHistory.push(Math.round((currentTime() - t0_respond) * 10) / 10)
+
+        currGuess = parseInt($(this).attr('id').replace('rightBox', ''));
+        guessHistory.push(currGuess);
+
+        $(this).off('click');
+        $(this).addClass('disabled');
+
+        if (currGuess == trial.opponentNumber) {
+          $(this).css('background-color', 'red');
+          turnDone = true;
+        } else {
+          $(this).css('background-color', 'black');
+        }
+
+        if (guessHistory.length == 3) {
+          turnDone = true;
+        }
+
+        if (turnDone) {
+          trial['rt'] = rtHistory;
+          trial['guessedNumber'] = guessHistory;
+          revealShip();
+        } else {
+          fired = false;
+        }
+      }
+    });
+  }
+
+  function revealShip() {
+
+    $('#gridContainerRight .grid-box').off('click')
+    $('#gridContainerRight .grid-box').addClass('disabled')
+    fired = false;
+
+    $('#leftBox' + trial.opponentNumber).addClass('ship');
+
+    requestAnimationFrame(() => {
+      $('#leftBox' + trial.opponentNumber).addClass('show-ship')
+    });
+
+    respond()
+  }
+
+  function respond() {
+    if (trial.guessedNumber.includes(trial.opponentNumber)) {
+      trial.guessCorrect = 1;
+      guessScore += (5 - trial.guessedNumber.length);
+      $("#rightScore").fadeOut(125, function() {
+        $("#rightScore").text("Total score: " + guessScore).fadeIn(125);
+      });
+    } else {
+      trial.guessCorrect = 0;
+      genScore += 1;
+      $("#leftScore").fadeOut(125, function() {
+        $("#leftScore").text("Total score: " + genScore).fadeIn(125);
+      });
+    }
+
+    trial['subjectID'] = subjectID;
+    responses['trialData'].push(trial);
+
+    setTimeout(loadTrial, itiTime);
+  }
+
+  function showQuestion() {
+    $('#experiment, #trialInstructions, #doneExperiment').hide();
+    $('#questionText').show();
+
+    document.getElementById('sumCheck').addEventListener('input', function() {
+      var text = this.value;
+
+      if (text == 2) {
+          answeredSum = true;
+      }
+
+      if(answeredSum == true && answeredTask == true && answeredPurpose == true && answeredPredictable == true) {
+        $('#doneExperiment').show();
+      }
+    });
+
+    document.getElementById('purposeGuess').addEventListener('input', function() {
+      var text = this.value;
+
+      if (text.length >= 1) {
+        answeredPurpose = true;
+      }
+      if(answeredSum == true && answeredTask == true && answeredPurpose == true && answeredPredictable == true) {
+        $('#doneExperiment').show();
+      }
+    });
+
+    document.getElementById('taskGuess').addEventListener('input', function() {
+      var text = this.value;
+
+      if (text.length >= 1) {
+        answeredTask = true;
+      }
+      if(answeredSum == true && answeredTask == true && answeredPurpose == true && answeredPredictable == true) {
+        $('#doneExperiment').show();
+      }
+    });
+
+    document.getElementById('predictableGuess').addEventListener('input', function() {
+      var text = this.value;
+
+      if (text.length >= 1) {
+        answeredPredictable = true;
+      }
+      if(answeredSum == true && answeredTask == true && answeredPurpose == true && answeredPredictable == true) {
+        $('#doneExperiment').show();
+      }
+    });
+
+  }
+
+  function doneExperiment() {
+    $('#questionText').hide();
+  	$('#doneText, #submitButton').show();
+  	$("#submitButton").css('visibility','visible');
+
+  	$('#commentBox').show();
+
+    assignExperimentInfo();
+
+  }
+
+  function assignExperimentInfo() {
+    responses['experimentName'] = experimentName;
+    responses['experimentVersion'] = experimentVersion;
+    responses['experimentTime'] = Math.round((currentTime() - startHITTime) * 10) / 10;
+
+    responses['studyID'] = studyID;
+    responses['sessionID'] = sessionID;
+
+    responses['browserName'] = browserInfo['name'];
+    responses['browserVersion'] = browserInfo['version'];
+    responses['displayWindowHeight'] = $(window).height();
+    responses['displayWindowWidth'] = $(window).width();
+    responses['displayScreenHeight'] = screen.height;
+    responses['displayScreenWidth'] = screen.width;
+
+  }
+
+  function submitData(outDir) {
+    responses['purposeGuess'] = document.getElementById('purposeGuess').value;
+    responses['taskGuess'] = document.getElementById('taskGuess').value;
+    responses['predictableGuess'] = document.getElementById('predictableGuess').value;
+    responses['commentText'] = document.getElementById('commentBox').value;
+    responses['totalTime'] = Math.round((currentTime() - startHITTime) * 10) / 10;
+
+    var opponentAnswer = document.querySelector('input[name="opponent"]:checked');
+    if (opponentAnswer) {
+      responses['opponentGuess'] = opponentAnswer.value;
+    }
+
+    // get data string from response array
+    var dataString = JSON.stringify(responses);
+
+    // post response to server
+
+    $.post("logTrial.py", {
+      subjectID: subjectID,
+      dataString: dataString,
+      outDir: outDir
+    });
+
+    $('#redirectToProlific').show();
+    $('#urlProlific').text(urlProlific);
+    $('#countDown').text((finalCountDownClock).toString());
+    redirectTimer = setInterval(countDown, 1000);
+  }
+
+  // countdown clock when finishing experiment
+  function countDown () {
+    finalCountDownClock--;
+    if (finalCountDownClock == 0) {
+      clearInterval(redirectTimer);
+      window.location = urlProlific;
+    } else {
+      $('#countDown').text((finalCountDownClock).toString());
+    }
+  }
+
+  // get current time, used for RTs, total experiment time, etc.
+  function currentTime() {
+    return performance.now();
+
+  }
+
+  // Utility: get a random integer between min and max inclusive.
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function getBrowser() {
+    var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+    if(/trident/i.test(M[1])) {
+      tem=/\brv[ :]+(\d+)/g.exec(ua) || [];
+      return {name:'IE',version:(tem[1]||'')};
+      }
+    if(M[1]==='Chrome') {
+      tem=ua.match(/\bOPR|Edge\/(\d+)/)
+      if(tem!=null) {
+        return {name:'Opera', version:tem[1]};
+        }
+      }
+    M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+    if((tem=ua.match(/version\/(\d+)/i))!=null) {
+      M.splice(1,1,tem[1]);
+    }
+    return {
+      name: M[0],
+      version: M[1]
+    };
+
+  }
+</script>
+
+<style>
+body {
+  font-family: Helvetica,Arial;
+  font-size: 3vh;
+  height: 100%;
+  margin: 10 auto;
+  margin-top: 1vh;
+  background: #ebe9e6;
+}
+
+.instructions {
+	display:block;
+	max-width: 80%;
+	margin: 0 auto;
+	margin-top: 0px;
+  text-align: left;
+}
+
+#searchText, #waitingText {
+  margin-top: 15%;
+  font-family: "Orbitron";
+  text-align: center;
+  font-size: 4vw;
+}
+
+.setupInstructions {
+  margin-top: 60vh;
+}
+
+.side {
+  position: absolute;
+  width: 30%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  mix-blend-mode: multiply;
+}
+
+.player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.score-row {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 30%;
+  margin-top: 50vh;
+}
+
+.left {
+  left: 10%;
+  transform: translate(10%, 1vh);
+}
+
+.right {
+  right: 10%;
+  transform: translate(-10%, 1vh);
+}
+
+.square {
+  width: 100%;
+  height: 100%;
+  border-radius: 1vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-left {
+  background-color: rgba(255, 176, 0, 0.3);
+  border: 0.5vw solid #ffb000;
+}
+
+.square-right {
+  background-color: rgba(100, 143, 255, 0.3);
+  border: 0.5vw solid #648fff;
+}
+
+.square-text {
+  font-family: "Orbitron";
+  font-size: 8vw;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  display: none;
+}
+
+#gridContainerLeft,
+#gridContainerRight {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.5rem;
+  width: 80%;
+  height: 80%;
+}
+
+.grid-box {
+  border: 1px solid #fff;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  transition: background-color 250ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.grid-box.ship::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('images/ship2.png') center/contain no-repeat;
+  opacity: 0;
+  transition: opacity 250ms ease;
+  pointer-events: none;
+}
+
+.grid-box.ship.show-ship::after {
+  opacity: 1;
+}
+
+/* for removing hover after click */
+#gridContainerRight.disabled .grid-box, #gridContainerLeft.disabled .grid-box {
+  pointer-events: none;
+}
+
+@keyframes flashRed {
+  0% { background-color: #fff; }
+  50% { background-color: #FF6102; }
+  100% { background-color: #fff; }
+}
+
+#gridContainerRight .grid-box:hover {
+  animation: flashRed 1s linear infinite;
+}
+
+#gridContainerRight .grid-box.disabled:hover {
+  animation: none !important;
+}
+
+.player {
+  width: 20%;
+  margin: 0;
+}
+
+.player-name {
+  font-family: "Orbitron";
+  font-weight: bold;
+  font-size: 3vw;
+  margin: 0;
+}
+
+.score-num {
+  font-family: "Orbitron";
+  font-size: 3vw;
+  margin: 0;
+}
+
+
+.trialInstructions {
+  font-family: "Orbitron";
+	display:block;
+	max-width: 80%;
+	margin: 0 auto;
+	margin-top: 0px;
+  text-align: left;
+  font-size: 1.8vw;
+}
+
+#browserCompat, #title {
+  font-size: 2vw;
+  text-align: center;
+  margin: 0 auto;
+  font-family: "Orbitron";
+}
+
+.button {
+  display: block;
+  width: 200px;
+  padding: 14px 28px;
+  margin: 10px auto;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #ff8c39;
+  border: none;
+  border-radius: 10px; /* pill-shaped */
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
+}
+
+.button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+}
+
+.wrapup {
+	display:none;
+	max-width: 500px;
+	text-align:center;
+	margin: 10px auto;
+	padding-bottom:10px;
+	font-size:14pt
+}
+
+.wrapup p {
+	font-size:12pt
+}
+
+.wrapup label {
+  font-size:12pt
+}
+
+#commentBox {
+	display:none;
+}
+
+span.keyboardkey {
+    box-shadow: rgb(132 132 132 / 0.16) 0.1vw 0.1vw 0.4vw 0.1vw;
+    text-shadow: none;
+    font-weight: bold;
+    margin-right: 0.4vw;
+    margin-left: 0.4vw;
+    font-family: Lucida Sans Unicode,Lucida Grande,sans-serif;
+    font-size: 1.4vw;
+    padding: 0.2em 1em;
+    border: 0.1vw solid;
+    border-color: #d6d6d6 #b4b4b4 #b4b4b4 #d6d6d6;
+    -moz-border-radius: 0.4vw;
+    -webkit-border-radius: 0.4vw;
+    border-radius: 0.4vw;
+    background-color: #F2F2F2;
+    background-image: -moz-linear-gradient(top, #FCFCFC, #E0E0E0);
+    background-image: -o-linear-gradient(top, #FCFCFC, #E0E0E0);
+    background-image: -webkit-linear-gradient(top, #FCFCFC, #E0E0E0);
+    background-image: linear-gradient(top, #FCFCFC, #E0E0E0);
+}
+
+.orbitron-<uniquifier> {
+  font-family: "Orbitron", serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+
+</style>
